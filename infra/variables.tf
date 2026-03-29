@@ -160,14 +160,14 @@ locals {
   cidr_prefix   = "${local.cidr_ip_parts[0]}.${local.cidr_ip_parts[1]}"
   vpcs = {
     security_vpc = {
-      name                             = "${var.name_prefix}-vpc"
+      name                             = "${var.name_prefix}"
       cidr                             = "${var.cidr}"
       assign_generated_ipv6_cidr_block = false
       nacls                            = {}
 
       security_groups = {
         vmseries_mgmt = {
-          name = "${var.name_prefix}-vmseries_mgmt-sg"
+          name = "vmseries_mgmt"
           rules = {
             all_outbound = {
               description = "Permit All traffic outbound"
