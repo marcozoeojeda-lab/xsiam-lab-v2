@@ -142,11 +142,6 @@ variable "vpcs" {
   }))
 }
 
-variable "vpc_name" {
-  description = "VPC Name"
-  type        = string
-}
-
 variable "cidr" {
   description = "VPC CIDR Block"
   type        = string
