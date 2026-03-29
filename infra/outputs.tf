@@ -30,5 +30,5 @@
 # }
 
 output "subnet_mgt" {
-  value = module.subnet_sets.subnets
+  value = module.subnet_sets
 }
