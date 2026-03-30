@@ -1,3 +1,7 @@
+locals {
+  vmseries_instances = flatten([for kv, vv in local.vmseries : [for ki, vi in vv.instances : { group = kv, instance = ki, az = vi.az, common = vv }]])
+}
+
 ### BOOTSTRAP PACKAGE
 module "bootstrap" {
   source = "./modules/bootstrap"
@@ -15,10 +19,6 @@ module "bootstrap" {
 }
 
 ### VM-Series INSTANCES
-
-locals {
-  vmseries_instances = flatten([for kv, vv in var.vmseries : [for ki, vi in vv.instances : { group = kv, instance = ki, az = vi.az, common = vv }]])
-}
 
 module "vmseries" {
   source = "./modules/vmseries"
