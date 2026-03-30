@@ -15,6 +15,18 @@ variable "ssh_key_name" {
   type        = string
 }
 
+variable "az" {
+  description = "Az where the firewall will be deployed"
+  type        = string
+  default     = "a"
+}
+
+variable "panos_version" {
+  description = "PAN-OS Version"
+  type        = string
+  default     = "11.1.4-h7"
+}
+
 ### VPC
 variable "vpcs" {
   description = <<-EOF
@@ -258,13 +270,6 @@ locals {
 }
 
 
-
-
-
-
-
-
-
 ### VM-SERIES
 variable "vmseries" {
   description = <<-EOF
@@ -354,24 +359,6 @@ variable "vmseries" {
   }))
 }
 
-variable "az" {
-  description = "Az where the firewall will be deployed"
-  type        = string
-  default     = "a"
-}
-
-variable "panos_version" {
-  description = "PAN-OS Version"
-  type        = string
-  default     = "11.1.4-h7"
-}
-
-
-
-
-
-
-
 ## Locals
 
 locals {
@@ -395,17 +382,17 @@ locals {
     panos_version = "${var.panos_version}"
     ebs_kms_id    = "alias/aws/ebs"
 
-    vpc = "security_vpc"
+    vpc = var.vpc_name
 
     interfaces = {
       mgmt = {
         device_index = 0
         private_ip = {
-          "01" = "10.10.0.4"
+          "01" = "${local.cidr_prefix}.0.4"
         }
         security_group     = "vmseries_mgmt"
-        vpc                = "security_vpc"
-        subnet_group       = "mgmt"
+        vpc                = var.vpc_name
+        subnet_group       = "${var.name_prefix}-mgmt"
         ipv6_address_count = 0
         create_public_ip   = false
         source_dest_check  = true
@@ -417,11 +404,11 @@ locals {
       public = {
         device_index = 1
         private_ip = {
-          "01" = "10.10.3.4"
+          "01" = "${local.cidr_prefix}.5.4"
         }
         security_group     = "vmseries_traffic"
-        vpc                = "security_vpc"
-        subnet_group       = "public"
+        vpc                = var.vpc_name
+        subnet_group       = "${var.name_prefix}-public"
         ipv6_address_count = 0
         create_public_ip   = true
         source_dest_check  = true
@@ -430,14 +417,14 @@ locals {
         }
       }
 
-      windows = {
+      vlan1 = {
         device_index = 2
         private_ip = {
-          "01" = "10.10.1.4"
+          "01" = "${local.cidr_prefix}.1.4"
         }
         security_group     = "vmseries_traffic"
-        vpc                = "security_vpc"
-        subnet_group       = "windows"
+        vpc                = var.vpc_name
+        subnet_group       = "${var.name_prefix}-vlan1"
         ipv6_address_count = 0
         create_public_ip   = false
         source_dest_check  = false
@@ -446,14 +433,44 @@ locals {
         }
       }
 
-      linux = {
+      vlan2 = {
         device_index = 3
         private_ip = {
-          "01" = "10.10.2.4"
+          "01" = "${local.cidr_prefix}.2.4"
         }
         security_group     = "vmseries_traffic"
-        vpc                = "security_vpc"
-        subnet_group       = "linux"
+        vpc                = var.vpc_name
+        subnet_group       = "${var.name_prefix}-vlan2"
+        ipv6_address_count = 0
+        create_public_ip   = false
+        source_dest_check  = false
+        eip_allocation_id = {
+          "01" = null
+        }
+      }
+      vlan3 = {
+        device_index = 4
+        private_ip = {
+          "01" = "${local.cidr_prefix}.3.4"
+        }
+        security_group     = "vmseries_traffic"
+        vpc                = var.vpc_name
+        subnet_group       = "${var.name_prefix}-vlan3"
+        ipv6_address_count = 0
+        create_public_ip   = false
+        source_dest_check  = false
+        eip_allocation_id = {
+          "01" = null
+        }
+      }
+      vlan4 = {
+        device_index = 5
+        private_ip = {
+          "01" = "${local.cidr_prefix}.4.4"
+        }
+        security_group     = "vmseries_traffic"
+        vpc                = var.vpc_name
+        subnet_group       = "${var.name_prefix}-vlan4"
         ipv6_address_count = 0
         create_public_ip   = false
         source_dest_check  = false
