@@ -5,7 +5,7 @@ module "broker_vm" {
   global_tags = var.global_tags
 }
 
-data "aws_ami" "broker" {
+data "aws_amis" "broker" {
   most_recent = true
 
   owners = ["self"]
@@ -17,7 +17,7 @@ data "aws_ami" "broker" {
 }
 
 locals {
-  broker_ami_id = try(data.aws_ami.broker.id, null)
+  broker_ami_id = length(data.aws_amis.broker.ids) > 0 ? data.aws_amis.broker.ids[0] : null
   engine_ami_id = try(data.aws_ami.ubuntu2204.id, null)
 }
 
