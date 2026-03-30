@@ -250,8 +250,6 @@ locals {
         "${local.cidr_prefix}.0.0/24" = { az = "${var.region}${var.az}", subnet_group = "${var.name_prefix}-mgmt", nacl = null, ipv6_index = null }
         "${local.cidr_prefix}.1.0/24" = { az = "${var.region}${var.az}", subnet_group = "${var.name_prefix}-vlan1", nacl = null, ipv6_index = null }
         "${local.cidr_prefix}.2.0/24" = { az = "${var.region}${var.az}", subnet_group = "${var.name_prefix}-vlan2", nacl = null, ipv6_index = null }
-        "${local.cidr_prefix}.3.0/24" = { az = "${var.region}${var.az}", subnet_group = "${var.name_prefix}-vlan3", nacl = null, ipv6_index = null }
-        "${local.cidr_prefix}.4.0/24" = { az = "${var.region}${var.az}", subnet_group = "${var.name_prefix}-vlan4", nacl = null, ipv6_index = null }
         "${local.cidr_prefix}.5.0/24" = { az = "${var.region}${var.az}", subnet_group = "${var.name_prefix}-public", nacl = null, ipv6_index = null }
       }
 
@@ -442,36 +440,6 @@ locals {
           security_group     = "vmseries_traffic"
           vpc                = var.vpc_name
           subnet_group       = "${var.name_prefix}-vlan2"
-          ipv6_address_count = 0
-          create_public_ip   = false
-          source_dest_check  = false
-          eip_allocation_id = {
-            "01" = null
-          }
-        }
-        vlan3 = {
-          device_index = 4
-          private_ip = {
-            "01" = "${local.cidr_prefix}.3.4"
-          }
-          security_group     = "vmseries_traffic"
-          vpc                = var.vpc_name
-          subnet_group       = "${var.name_prefix}-vlan3"
-          ipv6_address_count = 0
-          create_public_ip   = false
-          source_dest_check  = false
-          eip_allocation_id = {
-            "01" = null
-          }
-        }
-        vlan4 = {
-          device_index = 5
-          private_ip = {
-            "01" = "${local.cidr_prefix}.4.4"
-          }
-          security_group     = "vmseries_traffic"
-          vpc                = var.vpc_name
-          subnet_group       = "${var.name_prefix}-vlan4"
           ipv6_address_count = 0
           create_public_ip   = false
           source_dest_check  = false
