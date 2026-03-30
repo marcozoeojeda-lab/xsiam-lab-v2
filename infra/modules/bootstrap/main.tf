@@ -3,7 +3,7 @@ resource "random_id" "sufix" {
 }
 
 locals {
-  random_name   = "${var.prefix}${random_id.sufix.hex}"
+  random_name   = "${var.prefix}-boot-${random_id.sufix.hex}"
   bucket_name   = coalesce(var.bucket_name, local.random_name)
   aws_s3_bucket = var.create_bucket ? aws_s3_bucket.this[0] : data.aws_s3_bucket.this[0]
   iam_role_name = coalesce(var.iam_role_name, local.random_name)
