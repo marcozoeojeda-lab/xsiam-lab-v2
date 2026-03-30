@@ -19,6 +19,19 @@ locals {
   }
 }
 
+resource "aws_eip" "jumpbox" {
+  domain = "vpc"
+
+  tags = {
+    Name = "${var.name_prefix}-jumpbox-ip"
+  }
+}
+
+resource "aws_eip_association" "jumpbox" {
+  instance_id   = aws_instance.jumpbox.id
+  allocation_id = aws_eip.jumpbox.id
+}
+
 resource "aws_instance" "jumpbox" {
   for_each = local.jumpbox
 
