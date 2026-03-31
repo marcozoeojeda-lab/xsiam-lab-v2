@@ -12,12 +12,12 @@ This repository defines a complete lab environment including:
 - Jumpbox (the only one with Public IP)
 - Palo Alto VM-Series Firewall - BYOL - 4 vCPU
 - XSIAM components (optional)
-    -   Broker VM  
-    -   Engine 
+  - Broker VM  
+  - Engine 
 - Virtual machines
-    -   Windows Server 2022
-    -   Linux Ubuntu 22.04
-    -   Kali Linux
+  - Windows Server 2022
+  - Linux Ubuntu 22.04
+  - Kali Linux
 
 The deployment is fully automated and reproducible using Terraform.
 
@@ -38,26 +38,36 @@ An AWS account with permissions to create:
 - Elastic IP
 - S3 (for backend)
 
-Once with the AWS Account, you'll need to create and configure manually:
+Once you have the AWS account, you must manually create and configure:
 
 - EC2 Key Pair (download the private key)
-- S3 Bucket for Terraform Backend (S3_BACKEND)
-- AWS Access Key / AWS Access Key Secret
+- S3 Bucket for Terraform Backend (`S3_BACKEND`)
+- AWS Access Key / AWS Secret Access Key
 - Configure AWS CLI (optional)
 
-You'll need a Github account and fork this repo to create yours. On the repository Settings > Secrets and Variables > Actions, create these Repository Secrets/Variables:
+You will also need a GitHub account and fork this repository.
 
--  AWS_ACCESS_KEY_ID (Secret)
--  AWS_SECRET_ACCESS_KEY (Secret)
--  CORTEX_API_KEY (Secret)
--  CORTEX_API_KEY_ID (Secret)
--  AWS_REGION (Variable)
--  S3_BACKEND (Variable)
+Then go to:
+
+**Settings → Secrets and Variables → Actions**
+
+Create the following:
+
+**Secrets**
+- `AWS_ACCESS_KEY_ID`
+- `AWS_SECRET_ACCESS_KEY`
+- `CORTEX_API_KEY`
+- `CORTEX_API_KEY_ID`
+
+**Variables**
+- `AWS_REGION`
+- `S3_BACKEND`
 
 ---
 
 ## Repository Structure
 
+```text
 .
 ├── .github/
 │   └── workflows/
@@ -79,42 +89,76 @@ You'll need a Github account and fork this repo to create yours. On the reposito
 │   └── versions.tf
 ├── .gitignore
 └── README.md
+```
 
 ## Variables
 
-Defined in **infra/terraform.tfvars**, you need to change them:
+Defined in **infra/terraform.tfvars**, you need to update the following values:
 
-region      = "us-east-2"
-name_prefix = "davila-xsiam-lab"
+| Variable | Description | Example / Allowed Values |
+|----------|-------------|--------------------------|
+| `region` | AWS region where resources will be deployed | `us-east-2` |
+| `name_prefix` | Prefix used for naming all resources | `davila-xsiam-lab` |
+| `global_tags.ManagedBy` | Resource tag indicating management tool | `terraform` |
+| `global_tags.Application` | Resource tag for application name | `XSIAM Lab` |
+| `global_tags.Owner` | Resource tag for owner | `David Avila` |
+| `ssh_key_name` | SSH key pair name for EC2 access | `xsiam-lab-v2` |
+| `cidr` | CIDR block for the VPC | `10.10.0.0/16` |
+| `mgt_public_ips` | Allowed public IPs for management access | `["YOUR PUBLIC IP ADDRESS"]` |
+| `broker_vm` | Deploy Broker VM | `true / false` |
+| `broker_vm_key` | VMDK file name for Broker VM | `"file.vmdk"` |
+| `broker_vm_subnet` | Subnet for Broker VM | `vlan1 / vlan2` |
+| `engine_vm` | Deploy Engine VM | `true / false` |
+| `engine_vm_subnet` | Subnet for Engine VM | `vlan1 / vlan2` |
+| `linux_deploy` | Deploy Linux VM | `true / false` |
+| `windows_server_deploy` | Deploy Windows Server VM | `true / false` |
+| `kali_deploy` | Deploy Kali Linux VM | `true / false` |
 
-global_tags = {
-  ManagedBy   = "terraform"
-  Application = "XSIAM Lab"
-  Owner       = "David Avila"
-}
+---
 
-ssh_key_name = "xsiam-lab-v2"
+## Broker VM Deployment (VMDK → AMI)
 
-### VPC
+Follow these steps to deploy the Broker VM:
 
-cidr           = "10.10.0.0/16"
-mgt_public_ips = ["YOUR PUBLIC IP ADDRESS"]
+### Step 1 — Download VMDK
 
-### XSIAM Components
+Download the Broker VM `.vmdk` file from your XSIAM tenant.
 
-broker_vm        = false
-broker_vm_key    = ""
-broker_vm_subnet = "vlan1" # allowed values vlan1, vlan2. vlan1 by default
+Place the file inside the `infra/` directory.
 
-engine_vm        = false
-engine_vm_subnet = "vlan1" # allowed values vlan1, vlan2. vlan1 by default
+---
 
-### Deploy VMs
+### Step 2 — Update Variables
 
-linux_deploy          = true
-windows_server_deploy = true
-kali_deploy           = true
+Edit `infra/terraform.tfvars`:
 
+```hcl
+broker_vm     = true
+broker_vm_key = "your-vmdk-file-name.vmdk"
+```
+
+### Step 3 — Execute de Github Actions (terraform apply)
+
+Terraform will:
+
+- Create required resources (S3, IAM roles, etc.)
+- Prepare the environment for VM import
+- Generate required AWS CLI commands
+
+### Step 4 — Import VMDK to AMI
+
+After execution, Terraform outputs will include AWS CLI commands. Run them locally to:
+
+Upload the VMDK
+Import it as an AMI
+
+### Step 5 — Verify AMI
+Go to EC2 → AMIs
+Validate the image is available
+
+### Broker VM Documentation
+
+[Set up Broker VM on AWS (XSIAM Documentation)](https://docs-cortex.paloaltonetworks.com/r/Cortex-XSIAM/Cortex-XSIAM-Documentation/Set-up-Broker-VM-on-Amazon-Web-Services)
 
 ## Security
 
