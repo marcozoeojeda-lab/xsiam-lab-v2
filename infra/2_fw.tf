@@ -109,6 +109,19 @@ locals {
     k => v
     if can(regex("vlan", k))
   }
+
+  fw_default_routes = merge([
+    for fw_name, eni_map in local.fw_eni_ids : merge([
+      for rt_name, rt_data in local.fw_vlans : {
+        for az, rt_id in rt_data.unique_route_table_ids :
+        "${fw_name}-${rt_name}-${az}" => {
+          route_table_id = rt_id
+          eni_id         = eni_map[regex("vlan[0-9]+", rt_name)]
+        }
+        if can(eni_map[regex("vlan[0-9]+", rt_name)])
+      }
+    ]...)
+  ]...)
 }
 
 ### ROUTES ###
