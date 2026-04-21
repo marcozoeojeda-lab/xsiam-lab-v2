@@ -11,11 +11,11 @@ broker_vm        = false
 broker_vm_key    = "broker-vm-30.0.63.vmdk"
 broker_vm_subnet = "vlan1" # allowed values vlan1, vlan2. vlan1 by default
 
-engine_vm        = false
+engine_vm        = true
 engine_vm_subnet = "vlan1" # allowed values vlan1, vlan2. vlan1 by default
 
 ### Deploy VMs
 
-linux_deploy          = false
-windows_server_deploy = false
-kali_deploy           = false
+linux_deploy          = true
+windows_server_deploy = true
+kali_deploy           = true
